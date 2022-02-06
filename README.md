@@ -35,12 +35,8 @@ module.exports = {
 ```
 
 ### 各个插件介绍
-[fix-mini-css-plugin]: https://www.cnblogs.com/wzcsqaws/p/15860928.html
-[fix-mini-css-plugin]
-[fix-ensure-import-plugin]: https://www.cnblogs.com/wzcsqaws/p/15866181.html
-[fix-ensure-import-plugin]
-[transfer-js-plugin]: https://www.cnblogs.com/wzcsqaws/p/15866482.html
-[transfer-js-plugin]
-[transfer-vue-plugin]: https://www.cnblogs.com/wzcsqaws/p/15866482.html
-[transfer-vue-plugin]
+[fix-mini-css-plugin](https://www.cnblogs.com/wzcsqaws/p/15860928.html)
+[fix-ensure-import-plugin](https://www.cnblogs.com/wzcsqaws/p/15866181.html)
+[transfer-js-plugin](https://www.cnblogs.com/wzcsqaws/p/15866482.html)
+[transfer-vue-plugin](https://www.cnblogs.com/wzcsqaws/p/15866482.html)
 
