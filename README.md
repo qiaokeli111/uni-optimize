@@ -10,7 +10,7 @@ npm install -D uni-optimize
 该库是针对uni打包微信小程序的各方面优化插件集合，建议根据需求选择部分插件安装
 
 <font color=#A52A2A size=4 >vue和js的分包插件目前只能在生产模式使用!!!</font>
-
+<font color=#A52A2A size=4 >js的分包插件需要开启manifest.json中的以下配置"optimization":{"subPackages":true}</font>
 
 ### 所有插件使用方式
 ```
