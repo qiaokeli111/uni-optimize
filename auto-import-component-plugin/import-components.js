@@ -15,20 +15,28 @@ function genComponetCode (component, args) {
   }
 }
 function findElementTagContent (source, tag) {
-  var reg = new RegExp(`<(${tag})[^>]*>((.|\\n|\\r)*)<\\/(${tag})[^>]*>`)
-  let result = source.match(reg)
-  if (result && result[2]) {
-    return result[2]
-  }
-  return null
+    var reg = new RegExp(`<(${tag})[^>]*>((.|\\n|\\r)*)<\\/(${tag})[^>]*>`)
+    let result = source.match(reg)
+    if (result && result[2]) {
+        return result[2]
+    }
+    return null
 }
 function findFirstElementTag (source) {
-  var reg = new RegExp(`<[\\w-]+`)
-  let result = source.match(reg)
-  if (result && result[0]) {
-    return result[0].substring(1, result[0].length)
-  }
-  return null
+    var reg = new RegExp(`<[\\w-]+`)
+    let result = source.match(reg)
+    if (result && result[0]) {
+        return result[0].substring(1, result[0].length)
+    }
+    return null
+}
+function findElementCloseTag(source, tag) {
+    var reg = new RegExp(`<${tag}[^>]*\/>`)
+    let result = source.match(reg)
+    if (result && result[0]) {
+        return result[0]
+    }
+    return null
 }
 function insertCode (source, code) {
   let templateContent = findElementTagContent(source, 'template')
@@ -36,10 +44,22 @@ function insertCode (source, code) {
     var firstTag = findFirstElementTag(templateContent)
     if (firstTag) {
       let firstTagContent = findElementTagContent(templateContent, firstTag)
+      var addComponentContent = firstTagContent
+      // 有标签但是没有标签内容说明是闭合标签，那么在外层加一个view
       if (firstTagContent) {
-        var addComponentContent = firstTagContent + code
+        addComponentContent = firstTagContent + code
         source = source.replace(firstTagContent, addComponentContent)
+      }else{
+        let closeTag = findElementCloseTag(templateContent, firstTag)
+        addComponentContent = `
+<view>
+    ${closeTag}
+    ${code}
+</view>
+        `
+        source = source.replace(closeTag, addComponentContent)
       }
+     
     }
   }
   return source
@@ -64,5 +84,9 @@ module.exports = function (source) {
           }
     }
   })
-  return insertCode(source, code)
+  let result = insertCode(source, code)
+  if (result === source &&  code !== '') {
+    console.log(`页面没有成功导入组件：${resourcePath}`)
+  }
+  return result
 }

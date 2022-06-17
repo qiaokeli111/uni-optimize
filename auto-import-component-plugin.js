@@ -56,7 +56,6 @@ class importPlugin {
                 if (entryPaths.find(e=>e === currentResource)) {
                     const parsed = loaderUtils.parseQuery(query)
                     if (parsed.type === `template` && parsed.vue != null) {
-                        console.log(currentResource,123);
                         return true
                     }
                 }
