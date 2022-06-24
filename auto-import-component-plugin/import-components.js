@@ -2,17 +2,32 @@
 const loaderUtils = require('loader-utils')
 const path = require("path");
 function genComponetCode (component, args) {
-  var tempParams = ''
-  if (Object.prototype.toString.call(args) === '[object Array]') {
-    args.forEach(param => {
-      tempParams += `
-      ${param.key}="${param.value}"`
-    })
-    return `
-    <${component.name}${tempParams}
-    />
-    `
-  }
+    var tempParams = ''
+    if (Object.prototype.toString.call(args) === '[object Array]') {
+      args.forEach(param => {
+        tempParams += `
+        ${param.key}="${param.value}"`
+      })
+      return `
+      <${component.name}${tempParams}
+      />
+      `
+    }
+}
+function genComponetCodeByParcel(component, args,parcelCode) {
+    var tempParams = ''
+    if (Object.prototype.toString.call(args) === '[object Array]') {
+        args.forEach(param => {
+        tempParams += `
+        ${param.key}="${param.value}"`
+        })
+        return `
+        <${component.name}${tempParams}
+        >
+            ${parcelCode}
+        </${component.name} >
+        `
+    }
 }
 function findElementTagContent (source, tag) {
     var reg = new RegExp(`<(${tag})[^>]*>((.|\\n|\\r)*)<\\/(${tag})[^>]*>`)
@@ -65,10 +80,20 @@ function insertCode (source, code) {
   return source
 }
 
+function insertCodeByParcel(source, code) {
+    let templateContent = findElementTagContent(source, 'template')
+    if (templateContent) {
+        let temp = code.replace(REPLACR_WORD, templateContent)
+        source = source.replace(templateContent, temp)
+    }
+    return source
+}
+const REPLACR_WORD = 'CCCXXX'
 module.exports = function (source) {
   const options = loaderUtils.getOptions(this)
   const { resourcePath } = this
-  let code = ''
+  
+  let code = '',parcelCode = REPLACR_WORD,parcelComponents= []
   options.components.forEach(component => {
     var arg = {}
     if (path.resolve(component.src) !==resourcePath) {
@@ -76,16 +101,28 @@ module.exports = function (source) {
             !component.excludeFun ||
             (component.excludeFun && !component.excludeFun(resourcePath))
           ) {
-            if (component.paramFun) {
-              arg = component.paramFun(resourcePath)
+            if (component.parcelFun(resourcePath)) {
+                parcelComponents.push(component)
+            }else{
+                if (component.paramFun) {
+                    arg = component.paramFun(resourcePath)
+                }
+                let componentCode = genComponetCode(component, arg)
+                code += componentCode
             }
-            let componentCode = genComponetCode(component, arg)
-            code += componentCode
-          }
+        }
     }
   })
+  parcelComponents.forEach(component=>{
+    if (component.paramFun) {
+        arg = component.paramFun(resourcePath)
+    }
+    let componentCode = genComponetCodeByParcel(component, arg,parcelCode)
+    parcelCode = componentCode
+  })
   let result = insertCode(source, code)
-  if (result === source &&  code !== '') {
+  result = insertCodeByParcel(result, parcelCode)
+  if (result === source &&  (code !== '' || parcelCode !== '')) {
     console.log(`页面没有成功导入组件：${resourcePath}`)
   }
   return result

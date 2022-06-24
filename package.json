@@ -1,6 +1,6 @@
 {
   "name": "uni-optimize",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "uni打包微信小程优化插件集合",
   "main": "index.js",
   "scripts": {
